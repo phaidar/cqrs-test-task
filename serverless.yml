@@ -1,0 +1,65 @@
+service: organization-cqrs
+frameworkVersion: '3'
+configValidationMode: error
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-dotenv-plugin
+
+custom:
+  dotenv:
+    include:
+      - DATABASE
+      - STREAM
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - kinesis:PutRecord
+            - kinesis:PutRecords
+          Resource:
+            - Fn::GetAtt: [ kinesisStream, Arn ]
+
+functions:
+  createOrganization:
+    handler: commandHandler.createOrganization
+    events:
+      - http:
+          method: post
+          path: /{tenantId}/organization
+  updateOrganization:
+    handler: commandHandler.updateOrganization
+    events:
+      - http:
+          method: put
+          path: /{tenantId}/organization/{organizationId}
+  deleteOrganization:
+    handler: commandHandler.deleteOrganization
+    events:
+      - http:
+          method: delete
+          path: /{tenantId}/organization/{organizationId}
+
+  consumer:
+    handler: eventSource/index.consumer
+    events:
+      - stream:
+          type: kinesis
+          arn:
+            Fn::GetAtt:
+              - kinesisStream
+              - Arn
+
+resources:
+  Resources:
+    kinesisStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        Name: eventStream
+        RetentionPeriodHours: 24
+        ShardCount: 1
