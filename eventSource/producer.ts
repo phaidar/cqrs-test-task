@@ -28,9 +28,7 @@ const producer: APIGatewayProxyHandler = async (command) => {
 
   return {
     statusCode,
-    body: JSON.stringify({
-      message,
-    }),
+    body: command.payload.identifier,
   };
 };
 

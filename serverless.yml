@@ -38,12 +38,30 @@ functions:
       - http:
           method: put
           path: /{tenantId}/organization/{organizationId}
+  patchOrganization:
+    handler: commandHandler.updateOrganization
+    events:
+      - http:
+          method: patch
+          path: /{tenantId}/organization/{organizationId}
   deleteOrganization:
     handler: commandHandler.deleteOrganization
     events:
       - http:
           method: delete
           path: /{tenantId}/organization/{organizationId}
+  getOrganization:
+    handler: queries/index.getOrganization
+    events:
+      - http:
+          method: get
+          path: /{tenantId}/organization/{organizationId}
+  getOrganizations:
+    handler: queries/index.getOrganizations
+    events:
+      - http:
+          method: get
+          path: /{tenantId}/organization
 
   consumer:
     handler: eventSource/index.consumer

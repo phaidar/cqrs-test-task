@@ -37,6 +37,6 @@ export async function organizationCreatedEventHandler(payload: Organization, ten
     '${payload.alias}',
     '${payload.telecom}',
     '${payload.address}',
-    '${payload.partOf}',
+    '${payload.partOf}'
   )`)
 }

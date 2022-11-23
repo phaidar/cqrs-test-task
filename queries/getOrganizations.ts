@@ -1,12 +1,13 @@
 import { getClient } from '../database';
 
-export async function organizationDeletedEventHandler(tenantId: string, organizationId: string) {
+export const getOrganizations = async ({ pathParameters }) => {
+  const { tenantId } = pathParameters;
   const dbClient = await getClient();
   const db = await dbClient.query(`SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('${tenantId}');`);
   if (!db.length) {
     throw new Error('Wrong tenant');
   }
-  await dbClient.query(`USE ${tenantId};`);
+  dbClient.query(`USE ${tenantId};`);
 
-  return dbClient.query(`DELETE FROM organizations WHERE identifier = '${organizationId}';`);
-}
+  return dbClient.query('SELECT * FROM organizations');
+};

@@ -3,11 +3,11 @@ import { Organization } from '../types/organization';
 
 export async function organizationUpdatedEventHandler(payload: Organization, tenantId: string, organizationId: string) {
   const dbClient = await getClient();
-  const db = dbClient.query(`SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('${tenantId}');`);
+  const db = await dbClient.query(`SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('${tenantId}');`);
   if (!db.length) {
     throw new Error('Wrong tenant');
   }
-  dbClient.query(`USE ${tenantId};`);
+  await dbClient.query(`USE ${tenantId};`);
 
   return dbClient.query(`UPDATE organizations SET
     ${Object.entries(payload).map(([key, value]) => `${key} = ${value}`).join(',')}
